@@ -21,6 +21,7 @@ import org.apache.maven.surefire.report.RunListener;
 import org.apache.maven.surefire.report.SimpleReportEntry;
 import org.apache.maven.surefire.report.StackTraceWriter;
 import org.junit.gen5.engine.TestExecutionResult;
+import org.junit.gen5.engine.support.descriptor.JavaClassSource;
 import org.junit.gen5.engine.support.descriptor.JavaSource;
 import org.junit.gen5.launcher.TestExecutionListener;
 import org.junit.gen5.launcher.TestIdentifier;
@@ -98,6 +99,6 @@ final class RunListenerAdapter implements TestExecutionListener {
 	}
 
 	private Optional<JavaSource> getJavaSource(TestIdentifier testIdentifier) {
-		return testIdentifier.getSource().filter(JavaSource.class::isInstance).map(JavaSource.class::cast);
+		return testIdentifier.getSource().filter(JavaClassSource.class::isInstance).map(JavaClassSource.class::cast);
 	}
 }

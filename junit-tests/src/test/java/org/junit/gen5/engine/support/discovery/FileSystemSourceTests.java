@@ -19,69 +19,52 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.gen5.api.Test;
 import org.junit.gen5.commons.util.PreconditionViolationException;
-import org.junit.gen5.engine.support.descriptor.FileSystemSource;
-import org.junit.gen5.engine.support.descriptor.FileSystemSource.FilePosition;
+import org.junit.gen5.engine.support.descriptor.DirectorySource;
+import org.junit.gen5.engine.support.descriptor.FilePosition;
+import org.junit.gen5.engine.support.descriptor.FileSource;
 
 class FileSystemSourceTests {
 
 	@Test
 	void nullSourceFileOrDirectoryYieldsException() {
 		assertThrows(PreconditionViolationException.class, () -> {
-			new FileSystemSource(null);
+			new FileSource(null);
 		});
 	}
 
 	@Test
 	void directory() {
-		File directory = new File(".");
-		FileSystemSource source = new FileSystemSource(directory);
-
-		assertTrue(source.isDirectory());
-		assertFalse(source.isFile());
-		assertFalse(source.isFilePosition());
-		assertFalse(source.isJavaClass());
-		assertFalse(source.isJavaMethod());
-
-		assertEquals(directory, source.getFile());
-		assertThat(source.getPosition()).isEmpty();
-
-		assertEquals(directory.getAbsolutePath(), source.toString());
+		Path directoryPath = Paths.get(".");
+		DirectorySource source = new DirectorySource(directoryPath);
+		assertThat(source.getPath()).isEqualTo(directoryPath.toAbsolutePath());
+		assertThat(source.toString()).isEqualTo(directoryPath.toAbsolutePath().toString());
 	}
 
 	@Test
 	void fileWithoutPosition() throws Exception {
-		File file = spy(new File("test.txt"));
-		when(file.isDirectory()).thenReturn(false);
-		when(file.isFile()).thenReturn(true);
+		Path filePath = Paths.get("test.txt");
+		FileSource source = new FileSource(filePath);
 
-		FileSystemSource source = new FileSystemSource(file);
-
-		assertFalse(source.isDirectory());
-		assertTrue(source.isFile());
-		assertFalse(source.isFilePosition());
-		assertFalse(source.isJavaClass());
-		assertFalse(source.isJavaMethod());
-
-		assertEquals(file, source.getFile());
+		assertThat(source.getPath()).isEqualTo(filePath.toAbsolutePath());
 		assertThat(source.getPosition()).isEmpty();
-
-		assertEquals(file.getAbsolutePath(), source.toString());
+		assertThat(source.toString()).isEqualTo(filePath.toAbsolutePath().toString());
 	}
 
 	@Test
 	void fileWithPosition() throws Exception {
-		File file = new File("test.txt");
+		Path filePath = Paths.get("test.txt");
 		FilePosition position = new FilePosition(42, 23);
+		FileSource source = new FileSource(filePath, position);
 
-		FileSystemSource source = new FileSystemSource(file, position);
-
-		assertTrue(source.isFilePosition());
-		assertEquals(file, source.getFile());
+		assertThat(source.getPath()).isEqualTo(filePath.toAbsolutePath());
 		assertThat(source.getPosition()).hasValue(position);
-		assertEquals(file.getAbsolutePath() + " [42:23]", source.toString());
+
+		assertThat(source.toString()).isEqualTo(filePath.toAbsolutePath().toString() + " [42:23]");
 	}
 
 }

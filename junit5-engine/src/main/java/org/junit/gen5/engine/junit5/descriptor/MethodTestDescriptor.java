@@ -19,13 +19,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.junit.gen5.api.extension.AfterEachExtensionPoint;
-import org.junit.gen5.api.extension.BeforeEachExtensionPoint;
-import org.junit.gen5.api.extension.ConditionEvaluationResult;
-import org.junit.gen5.api.extension.ExceptionHandlerExtensionPoint;
-import org.junit.gen5.api.extension.InstancePostProcessor;
-import org.junit.gen5.api.extension.MethodInvocationContext;
-import org.junit.gen5.api.extension.TestExtensionContext;
+import org.junit.gen5.api.extension.*;
 import org.junit.gen5.commons.meta.API;
 import org.junit.gen5.commons.util.ExceptionUtils;
 import org.junit.gen5.commons.util.Preconditions;
@@ -40,7 +34,7 @@ import org.junit.gen5.engine.junit5.execution.ThrowableCollector;
 import org.junit.gen5.engine.junit5.extension.ExtensionRegistry;
 import org.junit.gen5.engine.junit5.extension.ExtensionRegistry.ApplicationOrder;
 import org.junit.gen5.engine.junit5.extension.RegisteredExtensionPoint;
-import org.junit.gen5.engine.support.descriptor.JavaSource;
+import org.junit.gen5.engine.support.descriptor.JavaMethodSource;
 import org.junit.gen5.engine.support.hierarchical.Leaf;
 
 /**
@@ -64,7 +58,7 @@ public class MethodTestDescriptor extends JUnit5TestDescriptor implements Leaf<J
 		this.testMethod = Preconditions.notNull(testMethod, "Method must not be null");
 		this.displayName = determineDisplayName(testMethod, testMethod.getName());
 
-		setSource(new JavaSource(testMethod));
+		setSource(new JavaMethodSource(testMethod));
 	}
 
 	@Override
@@ -120,10 +114,7 @@ public class MethodTestDescriptor extends JUnit5TestDescriptor implements Leaf<J
 			context.getExecutionListener(), this, testInstance);
 
 		// @formatter:off
-		return context.extend()
-				.withExtensionRegistry(extensionRegistry)
-				.withExtensionContext(testExtensionContext)
-				.build();
+		return context.extend().withExtensionRegistry(extensionRegistry).withExtensionContext(testExtensionContext).build();
 		// @formatter:on
 	}
 
